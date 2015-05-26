@@ -1,2 +1,3 @@
 # m-editor
-A Simple Mumps Editor to edit routine online through ewd.js
+
+ Simple Mumps Editor to edit mumps files online by utilizing ewd.js and M-Tools backend routines.
