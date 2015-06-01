@@ -137,6 +137,86 @@ EWD.application = {
         if(!routineName){return;}
         EWD.application.routines[routineName].editor.setOption("fullScreen", !EWD.application.routines[routineName].editor.getOption("fullScreen"));
     },
+    toggleBookmark: function(event){
+        event.preventDefault();
+        var routineName = $('.nav-tabs .active a').text().replace(' *','');
+        if(!routineName){return;}
+        var editor = EWD.application.routines[routineName].editor;
+        var lineNumber = editor.getCursor().line;
+        var found = false;
+        editor.getDoc().findMarksAt({line: lineNumber, ch:0}).forEach(function(bookmark){
+            bookmark.clear();
+            found = true;
+        });
+        if(!found){
+            var elem = document.createElement("span");
+            elem.className = 'glyphicon glyphicon-bookmark';
+            elem.setAttribute("aria-hidden", "true");
+            var bm = editor.getDoc().setBookmark({line: lineNumber, ch:0},{widget: elem});
+        }
+    },
+    clearBookmarks: function(event){
+        event.preventDefault();
+        var routineName = $('.nav-tabs .active a').text().replace(' *','');
+        if(!routineName){return;}
+        var editor = EWD.application.routines[routineName].editor;
+        editor.getDoc().getAllMarks().forEach(function(bookmark){
+            bookmark.clear();
+        });
+    },
+    nextBookmark: function(event){
+        event.preventDefault();
+        var routineName = $('.nav-tabs .active a').text().replace(' *','');
+        if(!routineName){return;}
+        var editor = EWD.application.routines[routineName].editor;
+        var cLine = editor.getDoc().getCursor().line;
+        if(editor.getDoc().getAllMarks().length > 0){
+            var found = false;
+            for(var i=cLine +1; i<editor.getDoc().lineCount(); i++){
+                if(editor.getDoc().findMarksAt({line: i, ch:0}).length > 0){
+                    editor.getDoc().setCursor({line: i, ch:0});
+                    found = true;
+                    return;
+                }
+            }
+            if(!found){
+                for(var i=0; i<editor.getDoc().lineCount(); i++){
+                    if(editor.getDoc().findMarksAt({line: i, ch:0}).length > 0){
+                        editor.getDoc().setCursor({line: i, ch:0});
+                        return;
+                    }
+                }
+            }
+        }
+    },
+    previousBookmark: function(event){
+        event.preventDefault();
+        var routineName = $('.nav-tabs .active a').text().replace(' *','');
+        if(!routineName){return;}
+        var editor = EWD.application.routines[routineName].editor;
+        var cLine = editor.getDoc().getCursor().line;
+        if(editor.getDoc().getAllMarks().length > 0){
+            var found = false;
+            if(cLine === 0){
+                cLine = editor.getDoc().lineCount() - 1;
+            }
+            for(var i=cLine - 1; i>=0; i--){
+                if(editor.getDoc().findMarksAt({line: i, ch:0}).length > 0){
+                    editor.getDoc().setCursor({line: i, ch:0});
+                    found = true;
+                    return;
+                }
+            }
+            if(!found){
+                for(var i=editor.getDoc().lineCount() - 1; i>=0; i--){
+                    if(editor.getDoc().findMarksAt({line: i, ch:0}).length > 0){
+                        editor.getDoc().setCursor({line: i, ch:0});
+                        return;
+                    }
+                }
+            }
+        }
+    },
     createRoutineTab: function(routineName,routinePath,routineText,newRoutine){
         var rid = 'tab' + routineName;
         var li = '';
@@ -179,6 +259,7 @@ EWD.application = {
             // detect key pressed
             var key = event.keyCode;
             if (event.ctrlKey) {
+                console.log(key);
                 if (key === 82) {
                     event.preventDefault();
                     $('#btnNew').click();
@@ -194,6 +275,28 @@ EWD.application = {
                 if (key === 118) {
                     event.preventDefault();
                     $('#btnBuild').click();
+                }
+                if (key === 113) {
+                    event.preventDefault();
+                    $('#mnuToggleBookmark').click();
+                }
+                if (event.shiftKey){
+                    if (key === 113){
+                        event.preventDefault();
+                        $('#mnuClearBookmark').click();
+                    }
+                }
+            }else{
+                if(event.shiftKey){
+                    if (key === 113){
+                        event.preventDefault();
+                        $('#mnuPreviousBookmark').click();
+                    }
+                }else{
+                    if (key === 113){
+                        event.preventDefault();
+                        $('#mnuNextBookmark').click();
+                    }
                 }
             }
         });
@@ -215,6 +318,10 @@ EWD.application = {
             .on('click','#mnuCompile', EWD.application.buildRoutine)
             .on('click','#btnFullScreen',EWD.application.setEditorFullScreen)
             .on('click','#mnuFullScreen',EWD.application.setEditorFullScreen)
+            .on('click','#mnuToggleBookmark',EWD.application.toggleBookmark)
+            .on('click','#mnuClearBookmark',EWD.application.clearBookmarks)
+            .on('click','#mnuNextBookmark',EWD.application.nextBookmark)
+            .on('click','#mnuPreviousBookmark',EWD.application.previousBookmark)
             .on('click','#btnNROK', function(event){
                 var routineName = $('#txtNewRoutine').val();
                 EWD.application.checkRoutineName(routineName);

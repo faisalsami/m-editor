@@ -43,7 +43,6 @@
                 <div class="navbar-brand visible-xs" id="ewd-navbar-title-phone"></div>
                 <div class="navbar-brand hidden-xs" id="ewd-navbar-title-other"></div>
             </div>
-
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
@@ -58,6 +57,15 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Edit <span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="#" id="mnuFullScreen">Full Screen  (Ctrl+F11)</a></li>
+                            <li class="dropdown dropdown-submenu">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Bookmarks</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#" id="mnuToggleBookmark">Toggle Bookmark  Ctrl+F2</a></li>
+                                    <li><a href="#" id="mnuClearBookmark">Clear Bookmarks  Ctrl+shift+F2</a></li>
+                                    <li><a href="#" style="word-spacing: 90px" id="mnuNextBookmark">Next  F2</a></li>
+                                    <li><a href="#" style="word-spacing: 60px" id="mnuPreviousBookmark">Previous  shift+F2</a></li>
+                                </ul>
+                            </li>
                         </ul>
                     </li>
                     <li class="dropdown" id="mnuBuild" style="display: none">
