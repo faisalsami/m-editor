@@ -47,7 +47,25 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">File <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu" id="mnuFile">
+                            <li><a href="#" id="mnuNew">New Ctrl+R</a></li>
+                            <li class="disabled"><a href="#" style="word-spacing: 40px" id="mnuSave">Save Ctrl+S</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="mnuEdit" style="display: none">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Edit <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#" id="mnuFullScreen">Full Screen  (Ctrl+F11)</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="mnuBuild" style="display: none">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Build <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#" style="word-spacing: 40px" id="mnuCompile">Compile Ctrl+F7</a></li>
+                        </ul>
+                    </li>
                 </ul>
                 <form class="navbar-form navbar-left" role="search">
                     <div class="form-group">
@@ -56,8 +74,10 @@
                     <button type="submit" id="openBtn" class="btn btn-default">Open</button>
                 </form>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#" id="btnNew">New</a></li>
-                    <li><a href="#" id="btnSave" style="display: none">Save</a></li>
+                    <li><a href="#" id="btnNew" data-toggle="tooltip" data-placement="bottom" title="New Routine (Ctrl+R)"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a></li>
+                    <li><a href="#" id="btnSave" style="display: none" data-toggle="tooltip" data-placement="bottom" title="Save Routine (Ctrl+S)"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></a></li>
+                    <li><a href="#" id="btnBuild" style="display: none"data-toggle="tooltip" data-placement="bottom" title="Compile Routine (Ctrl+F7)"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span></a></li>
+                    <li><a href="#" id="btnFullScreen" style="display: none"data-toggle="tooltip" data-placement="bottom" title="Full Screen (Ctrl+F11)"><span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span></a></li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
@@ -79,19 +99,56 @@
             <div class="well" id="content_results"></div>
         </div>
     </div>
-    <div class="modal fade bs-example-modal-sm" id="newRoutineModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal fade bs-example-modal-sm" id="newRoutineModal" tabindex="-1" role="dialog" aria-labelledby="newRoutineModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">New Routine</h4>
+                    <h4 class="modal-title" id="newRoutineModalLabel">New Routine</h4>
                 </div>
                 <div class="modal-body">
-                    <input id="txtNewRoutine" class="form-control">
+                    <input id="txtNewRoutine" class="form-control" placeholder="Enter Routine Name">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="button" id="btnNROK" class="btn btn-primary">OK</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade bs-example-modal-sm" id="saveChnagesModal" tabindex="-1" role="dialog" aria-labelledby="saveChnagesModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="saveChnagesModalLabel">Save Changes</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="saveChangesBody"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnSCYes" class="btn btn-primary">Yes</button>
+                    <button type="button" id="btnSCNo" class="btn btn-primary">No</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade bs-example-modal-sm" id="selectDirectoryModal" tabindex="-1" role="dialog" aria-labelledby="selectDirectoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="selectDirectoryModalLabel">Select Directory</h4>
+                </div>
+                <div class="modal-body">
+                    Select Directory for the routine <B id="selDirRoutine"></B>
+                    <div class="list-group" id="selectDirectoryBody">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnSDOK" class="btn btn-primary">OK</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
