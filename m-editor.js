@@ -1,159 +1,157 @@
 // Re-usable core VistA interface functions
 
-//getFilesByName -- used to search a fileman file by name; using the B index of DIC global
-var getFilesByName = function(prefix, max, ewd) {
-    var dicIndex = new ewd.mumps.GlobalNode("DIC", ["B"]);
-    var results = [];
-    var namesById = {};
-    var i = 0;
-    dicIndex._forPrefix(prefix.toUpperCase(), function(name, node) {
-        node._forEach(function(id) {
-            i++;
-            if (i > max) return true;
-            results.push({
-                id: id,
-                text: name
-            });
-            namesById[id] = name;
+var fs = require('fs');
+var path = require('path');
+var exec = require('child_process').exec;
+
+var listRoutines = function(routineName){
+    var files = [];
+    var count = 0;
+    var gtmRoutines = process.env.gtmroutines;
+    var rsplit = gtmRoutines.split('(');
+    for(var i=1; i < rsplit.length; i++){
+        var dir = rsplit[i].split(')')[0];
+        fs.readdirSync(dir).forEach(function(name){
+            if(count > 19){return files;}
+            var stats = fs.statSync(dir + '/' + name);
+            if(!stats.isDirectory()){
+                if(name.indexOf(routineName) === 0){
+                    count = count + 1;
+                    files.push({
+                        id: count,
+                        path: dir + '/' + name,
+                        text: name.split('.')[0]
+                    });
+                }
+            }
         });
-        if (i > max) return true;
-    });
-    return {
-        results: results,
-        namesById: namesById
-    };
+    }
+    return files;
 };
 
-//getChildNode -- return back the file object
-//                If exists and is not multiple then it will be returned back file from DIC global
-//                otherwise it is assumed that it is multiple and look for parent file and get the file object through recursive call
-var getChildNode = function(fileNumber,ewd){
+var getRoutine = function(routinePath){
     var result = {};
-    var file = new ewd.mumps.GlobalNode("DIC", [fileNumber, '0']);
-    if(file._exists){
-        var fileName = '';
-        var fileName = file._value.split('^')[0] + ' [' + fileNumber + ']';
-        result.name = fileName;
-        result.children = [];
+    result.error = '';
+    var invalid = true;
+    var gtmRoutines = process.env.gtmroutines;
+    var rsplit = gtmRoutines.split('(');
+    for(var i=1; i < rsplit.length; i++){
+        var dir = rsplit[i].split(')')[0];
+        if(routinePath.indexOf(dir) === 0){
+            invalid = false;
+        }
+    }
+    if(invalid){
+        result.error = 'Invalid path to get routine.';
+        return result;
+    }
+    if(fs.existsSync(routinePath)){
+        var routineName = path.basename(routinePath);
+        result.name = routineName.split('.')[0];
+        result.path = routinePath;
+        result.routine = fs.readFileSync(routinePath).toString();
     }else{
-        var file = new ewd.mumps.GlobalNode("DD", [fileNumber, '0', 'UP']);
-        if(file._exists){
-            result = getChildNode(file._value,ewd);
-        }
-        else{
-            result = null;
-        }
+        result.error = 'Routine Path not given.'
     }
     return result;
 };
 
-//getFilePointers -- return a fileman file's pointer fields in results array
-//                   It also include multiple field and traverse that multiple file to look for pointer file through recursive call
-var getFilePointers = function(fileNumber, ewd){
-    var results = [];
-    var file = new ewd.mumps.GlobalNode("DD", [fileNumber]);
-    //Traverse all fields of fileman file through DD Global
-    file._forRange('0', 'A', function(fieldNumber, node) {
-        if(fieldNumber == '0') return;
-        if(isNaN(fieldNumber)) return;
-        var field = new ewd.mumps.GlobalNode("DD", [fileNumber, fieldNumber, '0']);
-        var field0Node = field._value.split('^');
-        //Look for the second piece of the ^DD(fileNumber, fieldNumber, 0) node for the pointer or Variable Pointer field
-        //if second piece contains P means it is a pointer type field
-        if(field0Node[1].indexOf("P") > -1){
-            //If Second Piece contains , means there is global with file number like TIU(8925,
-            if(field0Node[2].indexOf(",") > -1){
-                var pointedFile0 = new ewd.mumps.GlobalNode(field0Node[2].split('(')[0], [field0Node[2].split('(')[1].split(',')[0], '0']);
-                if(pointedFile0._exists){
-                    var fileName = '';
-                    fileName = pointedFile0._value.split('^')[0] + ' [' + pointedFile0._value.split('^')[1] + ']';
-                    results.push({
-                        "name": fileName,
-                        "children": []
-                    });
-                }
-            }
-            //else we assume that Socond piece would be containg the global reference without file number within node like ^DPT(
-            else {
-                var pointedFile0 = new ewd.mumps.GlobalNode(field0Node[2].split('(')[0], ['0']);
-                if(pointedFile0._exists){
-                    var fileName = '';
-                    fileName = pointedFile0._value.split('^')[0] + ' [' + pointedFile0._value.split('^')[1] + ']';
-                    results.push({
-                        "name": fileName,
-                        "children": []
-                    });
-                }
-            }
+var saveRoutine = function(routinePath,routineText,isNew){
+    var result = {};
+    result.error = '';
+    var invalid = true;
+    var gtmRoutines = process.env.gtmroutines;
+    var rsplit = gtmRoutines.split('(');
+    for(var i=1; i < rsplit.length; i++){
+        var dir = rsplit[i].split(')')[0];
+        if(routinePath.indexOf(dir) === 0){
+            invalid = false;
         }
-        //if second piece contains V means it is a Variable Pointer type field
-        if(field0Node[1].indexOf("V") > -1){
-            //Get all the files from the B index of the variable pointer field node
-            var vpointerfiles = new ewd.mumps.GlobalNode("DD", [fileNumber, fieldNumber, "V", "B"]);
-            vpointerfiles._forEach(function(vfile, vfnode) {
-                var file = new ewd.mumps.GlobalNode("DIC", [vfile, '0']);
-                var fileName = '';
-                var fileName = file._value.split('^')[0] + ' [' + vfile + ']';
-                results.push({
-                    "name": fileName,
-                    "children": []
-                });
-            });
-        }
-        //Check to see if the field is multiple if the field is multiple then it will always have some float value on the second piece
-        var multipleFileNumber = parseFloat(field0Node[1]);
-        if(multipleFileNumber>0){
-            var multipleFile = new ewd.mumps.GlobalNode("DD", [multipleFileNumber, '0']);
-            if(multipleFile._exists){
-                var fileName = multipleFile._value.split('^')[0] + ' [' + multipleFileNumber + ']';
-                //If multiple file exists then do recursive call to get all pointers of that multiple file
-                var multipleResults = getFilePointers(multipleFileNumber, ewd);
-                if(multipleResults.length > 0){
-                    results.push({
-                        "name" : fileName,
-                        "children": multipleResults
-                    });
-                }
-            }
-        }
-    });
-    return results;
+    }
+    if(invalid){
+        result.error = 'Invalid path to save routine.';
+        return result;
+    }
+    if(fs.existsSync(routinePath) || isNew){
+        fs.writeFileSync(routinePath, routineText);
+        result.saved = true;
+    }else{
+        result.error = 'Routine Path not given.'
+    }
+    return result;
 };
 
-//Prepare data for the tree
-//upward object's children array contains all the files that used as pointed file in pointer or variable pointer fields of that file (in Pointers)
-//donward object's children array contains all the files that have that file used as pointed file in their fields (out Pointers)
-var prepareTreeData = function(fileNumber, ewd) {
-    var file = new ewd.mumps.GlobalNode("DIC", [fileNumber, '0']);
-    var fileName = '';
-    fileName = file._value.split('^')[0] + ' [' + fileNumber + ']';
-    var downward = {
-        "direction":"downward",
-        "name":"origin",
-        "children": []
-    };
-    var upward = {
-        "direction":"upward",
-        "name":"origin",
-        "children": []
-    };
-    // The "PT" node of file zero node contains all the files in which that file is used as a pointed file.
-    var filePT = new ewd.mumps.GlobalNode("DD", [fileNumber, '0', 'PT']);
-    filePT._forEach(function(name, node) {
-        var result = getChildNode(name,ewd);
-        if(result !== null){
-            downward.children.push(result);
+var buildRoutine = function(routinePath,ewd){
+    var result = {};
+    result.error = '';
+    var invalid = true;
+    var gtmRoutines = process.env.gtmroutines;
+    var rsplit = gtmRoutines.split('(');
+    for(var i=1; i < rsplit.length; i++){
+        var dir = rsplit[i].split(')')[0];
+        if(routinePath.indexOf(dir) === 0){
+            invalid = false;
         }
-    });
-    var files = getFilePointers(fileNumber, ewd);
-    upward.children = files;
-    return {
-        "name": fileName,
-        "fileDD" : {
-            "upward": upward,
-            "downward": downward
+    }
+    if(invalid){
+        result.error = 'Invalid path to build routine.';
+        return result;
+    }
+    if(fs.existsSync(routinePath)){
+        var command = 'mumps ' + routinePath;
+        var child = exec(command,
+            function (error, stdout, stderr) {
+                var result = {};
+                result.output = '';
+                if(stdout.toString()){
+                    result.output = result.output + '\n' + stdout.toString();
+                }
+                if(stderr.toString()){
+                    result.output = result.output + '\n' + stderr.toString();
+                }
+                result.build = true;
+                ewd.sendWebSocketMsg({
+                    type: 'buildRoutine',
+                    message: result
+                });
+            });
+    }else{
+        result.error = 'Routine Path not given.';
+        //return result;
+    }
+};
+
+var checkRoutineName = function(routineName){
+    var result = {};
+    result.check = false;
+    result.error = '';
+    var patt = /^[A-Z%][0-9A-Z]{0,7}$/i;
+    if(patt.test(routineName)){
+        var gtmRoutines = process.env.gtmroutines;
+        var rsplit = gtmRoutines.split('(');
+        result.dirs = [];
+        for(var i=1; i < rsplit.length; i++){
+            result.dirs.push(rsplit[i].split(')')[0] + '/');
         }
-    };
+        result.check = true;
+        result.routine = routineName;
+        for(var i=1; i < rsplit.length; i++){
+            var dir = rsplit[i].split(')')[0];
+            fs.readdirSync(dir).forEach(function(name){
+                var stats = fs.statSync(dir + '/' + name);
+                if(!stats.isDirectory()){
+                    if(name == (routineName + '.m')){
+                        result.check = false;
+                        result.error = 'Routine with this name already exists.';
+                        return result;
+                    }
+                }
+            });
+        }
+    }else{
+        result.error = 'Invalid Routine Name.';
+    }
+    return result;
 };
 
 module.exports = {
@@ -161,29 +159,28 @@ module.exports = {
     // EWD.js Application Handlers/wrappers
 
     onMessage: {
-        fileQuery: function(params, ewd) {
-            var results = getFilesByName(params.prefix, 40, ewd);
-            ewd.session.$('files')._delete();
-            ewd.session.$('files')._setDocument(results.namesById);
+        routineQuery: function(params, ewd) {
+            var files = listRoutines(params.prefix.toUpperCase());
             ewd.sendWebSocketMsg({
-                type: 'fileMatches',
-                message: results.results
+                type: 'routineMatches',
+                message: files
             });
-
         },
-        fileSelected: function(params, ewd) {
-            var file = new ewd.mumps.GlobalNode('DIC', [params.fileId]);
-            if(!file._exists){
-                return{
-                    error: params.fileId + ' file not exists.'
-                }
-            }
-            ewd.session.$('fileIdSelected')._value = params.fileId;
-            var results = prepareTreeData(params.fileId, ewd);
-            return {
-                results: results,
-                error: ''
-            };
+        getRoutine: function(params, ewd) {
+            var result = getRoutine(params.routinePath);
+            return result;
+        },
+        saveRoutine: function(params,ewd){
+            var result = saveRoutine(params.routinePath,params.routineText,params.newRoutine);
+            return result;
+        },
+        buildRoutine: function(params,ewd){
+            buildRoutine(params.routinePath,ewd);
+            //return result;
+        },
+        checkRoutineName: function(params,ewd){
+            var result = checkRoutineName(params.routineName.trim().toUpperCase());
+            return result;
         }
     }
 };
