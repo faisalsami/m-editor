@@ -259,7 +259,6 @@ EWD.application = {
             // detect key pressed
             var key = event.keyCode;
             if (event.ctrlKey) {
-                console.log(key);
                 if (key === 82) {
                     event.preventDefault();
                     $('#btnNew').click();
