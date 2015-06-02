@@ -159,7 +159,22 @@ module.exports = {
     // EWD.js Application Handlers/wrappers
 
     onMessage: {
+        Login: function(params,ewd){
+            if(params.password === 'fasy'){
+                ewd.session.setAuthenticated();
+                return {
+                    error: '',
+                    authenticated: true
+                };
+            }else{
+                return {
+                    error: 'Invalid Password.',
+                    authenticated: false
+                };
+            }
+        },
         routineQuery: function(params, ewd) {
+            if (!ewd.session.isAuthenticated) {return;}
             var files = listRoutines(params.prefix.toUpperCase());
             ewd.sendWebSocketMsg({
                 type: 'routineMatches',
@@ -167,18 +182,22 @@ module.exports = {
             });
         },
         getRoutine: function(params, ewd) {
+            if (!ewd.session.isAuthenticated) {return;}
             var result = getRoutine(params.routinePath);
             return result;
         },
         saveRoutine: function(params,ewd){
+            if (!ewd.session.isAuthenticated) {return;}
             var result = saveRoutine(params.routinePath,params.routineText,params.newRoutine);
             return result;
         },
         buildRoutine: function(params,ewd){
+            if (!ewd.session.isAuthenticated) {return;}
             buildRoutine(params.routinePath,ewd);
             //return result;
         },
         checkRoutineName: function(params,ewd){
+            if (!ewd.session.isAuthenticated) {return;}
             var result = checkRoutineName(params.routineName.trim().toUpperCase());
             return result;
         }

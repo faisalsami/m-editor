@@ -39,6 +39,17 @@ EWD.application = {
             backdrop: 'static'
         });
     },
+    Login: function(event){
+        event.preventDefault();
+        var password = $('#txtPassword').val();
+        EWD.sockets.sendMessage({
+            type: 'Login',
+            params: {
+                password: password,
+                authorization: EWD.application.authorization
+            }
+        });
+    },
     openRoutine: function(routineName,routinePath){
         var found = false;
         $('.nav-tabs li').each(function(index, element) {
@@ -252,6 +263,10 @@ EWD.application = {
         $('.nav-tabs li:last-child a').click();
     },
     onStartup: function() {
+        $('#loginModal').modal({
+            keyboard: false,
+            backdrop: 'static'
+        });
         EWD.application.routines = {};
         EWD.application.saveonclosing = false;
         this.enableSelect2(EWD.application.authorization);
@@ -299,6 +314,11 @@ EWD.application = {
                 }
             }
         });
+        $('#loginPanelBody').keydown(function(event){
+            if (event.keyCode === 13) {
+                document.getElementById('btnLogin').click();
+            }
+        });
         $('body')
             .on( 'click', '#openBtn', function(event) {
                 event.preventDefault();
@@ -321,6 +341,7 @@ EWD.application = {
             .on('click','#mnuClearBookmark',EWD.application.clearBookmarks)
             .on('click','#mnuNextBookmark',EWD.application.nextBookmark)
             .on('click','#mnuPreviousBookmark',EWD.application.previousBookmark)
+            .on('click','#btnLogin',EWD.application.Login)
             .on('click','#btnNROK', function(event){
                 var routineName = $('#txtNewRoutine').val();
                 EWD.application.checkRoutineName(routineName);
@@ -498,6 +519,17 @@ EWD.application = {
                 }
             }
             return;
+        },
+        Login: function(messageObj){
+            if(messageObj.message.error){
+                alert(messageObj.message.error);
+            }else{
+                if(messageObj.message.authenticated){
+                    $('#loginModal').modal('hide');
+                }else{
+                    alert('error!');
+                }
+            }
         }
     }
 
