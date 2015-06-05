@@ -2,7 +2,7 @@
 
  Simple Web based Mumps Editor for [gtm](http://www.fisglobal.com/products-technologyplatforms-gtm) to edit mumps routines online by utilizing ewd.js and Node.js.
  
- Please visit the following url for a live version running under OSEHRA FOIA VistA release. 
+ Please visit the following url for a live version running under OSEHRA FOIA VistA release. Password for application is 123
  
  [http://104.197.41.218:8080/ewd/m-editor/index.html](http://104.197.41.218:8080/ewd/m-editor/index.html)
  
