@@ -40,8 +40,8 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <div class="navbar-brand visible-xs" id="ewd-navbar-title-phone"></div>
-                <div class="navbar-brand hidden-xs" id="ewd-navbar-title-other"></div>
+                <a class="navbar-brand visible-xs" id="ewd-navbar-title-phone" target="_blank" href="https://github.com/faisalsami/m-editor"></a>
+                <a class="navbar-brand hidden-xs" id="ewd-navbar-title-other" target="_blank" href="https://github.com/faisalsami/m-editor"></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -74,6 +74,12 @@
                             <li><a href="#" style="word-spacing: 40px" id="mnuCompile">Compile Ctrl+F7</a></li>
                         </ul>
                     </li>
+                    <li class="dropdown" id="mnuHelp">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Help <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#" id="mnuAbout">About</a></li>
+                        </ul>
+                    </li>
                 </ul>
                 <form class="navbar-form navbar-left" role="search">
                     <div class="form-group">
@@ -81,17 +87,22 @@
                     </div>
                     <button type="submit" id="openBtn" class="btn btn-default">Open</button>
                 </form>
-                <ul class="nav navbar-nav navbar-right">
+                <ul class="nav navbar-nav navbar-left">
                     <li><a href="#" id="btnNew" data-toggle="tooltip" data-placement="bottom" title="New Routine (Ctrl+R)"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a></li>
                     <li><a href="#" id="btnSave" style="display: none" data-toggle="tooltip" data-placement="bottom" title="Save Routine (Ctrl+S)"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></a></li>
                     <li><a href="#" id="btnBuild" style="display: none"data-toggle="tooltip" data-placement="bottom" title="Compile Routine (Ctrl+F7)"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span></a></li>
                     <li><a href="#" id="btnFullScreen" style="display: none"data-toggle="tooltip" data-placement="bottom" title="Full Screen (Ctrl+F11)"><span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span></a></li>
                 </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><div class="g-plusone" data-annotation="inline" data-width="200"></div></li>
+                    <li><iframe src="https://ghbtns.com/github-btn.html?user=faisalsami&repo=m-editor&type=star&count=true" frameborder="0" scrolling="0" width="100px" height="20px"></iframe></li>
+                    <li><script type="IN/Share" data-url="https://github.com/faisalsami/m-editor" data-counter="right"></script></li>
+                </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
     </nav>
     <!-- Main body -->
-    <div id="content" class="container">
+    <div id="content" class="container row">
         <!-- main CONTAINER -->
         <div class="row">
             <ul class="nav nav-tabs">
@@ -103,10 +114,12 @@
 
             </div>
         </div>
-        <div class="row">
+    </div>
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+        <div class="container">
             <div class="well" id="content_results"></div>
         </div>
-    </div>
+    </nav>
     <div class="modal fade bs-example-modal-sm" id="newRoutineModal" tabindex="-1" role="dialog" aria-labelledby="newRoutineModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -180,12 +193,46 @@
             </div>
         </div>
     </div>
+    <div class="modal fade bs-example-modal-sm" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="aboutModalLabel">About</h4>
+                </div>
+                <div class="modal-body">
+                    <h4>m-editor</h4>
+                    <p>Simple Web based Mumps Editor for <a href="http://www.fisglobal.com/products-technologyplatforms-gtm" target="_blank">gtm</a> to edit mumps routines online by utilizing ewd.js and Node.js.</p>
+                    <br/>
+                    <h4>Features</h4>
+                    <ul>
+                        <li>Edit, Save, and Compile Routine</li>
+                        <li>Create new routine</li>
+                        <li>Full Screen button to view routine in full screen</li>
+                        <li>Bookmarking functions available as it is in Intersystems's Cache</li>
+                    </ul>
+                    <br/>
+                    <h4>About Author</h4>
+                    <script type="IN/MemberProfile" data-id="https://www.linkedin.com/in/faisalsami" data-format="inline" data-related="false"></script>
+                    <br/>
+                    <div class="g-follow" data-annotation="bubble" data-height="20" data-href="//plus.google.com/u/0/117542337982302855268" data-rel="author"></div>
+                    <br/>
+                    <iframe src="https://ghbtns.com/github-btn.html?user=faisalsami&type=follow&count=true&size=large" frameborder="0" scrolling="0" width="220px" height="30px"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="js/jquery-1.11.3.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/cm.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="//platform.linkedin.com/in.js" type="text/javascript"> lang: en_US</script>
     <script src="/ewdjs/EWD.js"></script>
 
     <script type="text/javascript" src="app.js"></script>

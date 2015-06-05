@@ -262,6 +262,16 @@ EWD.application = {
         editor.on("change",EWD.application.textChanged);
         $('.nav-tabs li:last-child a').click();
     },
+    showAbout: function(event){
+        event.preventDefault();
+        //$('#txtNewRoutine').val('');
+        //var mbody = '<script type="IN/MemberProfile" data-id="https://www.linkedin.com/in/faisalsami" data-format="inline" data-related="false"></script>';
+        //$('#aboutModalSocial').html(mbody);
+        $('#aboutModal').modal({
+            keyboard: true,
+            backdrop: 'static'
+        });
+    },
     onStartup: function() {
         $('#loginModal').modal({
             keyboard: false,
@@ -342,6 +352,7 @@ EWD.application = {
             .on('click','#mnuNextBookmark',EWD.application.nextBookmark)
             .on('click','#mnuPreviousBookmark',EWD.application.previousBookmark)
             .on('click','#btnLogin',EWD.application.Login)
+            .on('click','#mnuAbout',EWD.application.showAbout)
             .on('click','#btnNROK', function(event){
                 var routineName = $('#txtNewRoutine').val();
                 EWD.application.checkRoutineName(routineName);

@@ -14,8 +14,10 @@ body {
     height: 100%;
 }
 #content_results{
-    max-height: 150px;
+    height: 100%;
     overflow-y:scroll;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 .nav-tabs > li {
     position:relative;
@@ -39,7 +41,7 @@ body {
     top: 0; left: 0; right: 0; bottom: 0;
     height: auto;
     z-index: 9;
-    margin-top: 50px;
+    margin-top: 100px;
 }
 .dropdown-submenu {
     position:relative;

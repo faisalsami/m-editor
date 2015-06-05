@@ -1,6 +1,6 @@
 # m-editor
 
- Simple Mumps Editor for [gtm](http://www.fisglobal.com/products-technologyplatforms-gtm) to edit mumps routines online by utilizing ewd.js and Node.js.
+ Simple Web based Mumps Editor for [gtm](http://www.fisglobal.com/products-technologyplatforms-gtm) to edit mumps routines online by utilizing ewd.js and Node.js.
  
  Please visit the following url for a live version running under OSEHRA FOIA VistA release. 
  
