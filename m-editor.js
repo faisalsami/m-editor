@@ -85,20 +85,32 @@ var buildRoutine = function(routinePath,ewd){
     var result = {};
     result.error = '';
     var invalid = true;
+    var objPath = '';
     var gtmRoutines = process.env.gtmroutines;
     var rsplit = gtmRoutines.split('(');
     for(var i=1; i < rsplit.length; i++){
         var dir = rsplit[i].split(')')[0];
         if(routinePath.indexOf(dir) === 0){
+            if(rsplit[i-1].indexOf(')')>=0){
+                objPath = rsplit[i-1].split(')')[1].trim();
+            }else{
+                objPath = rsplit[i-1].trim();
+            }
             invalid = false;
         }
     }
     if(invalid){
         result.error = 'Invalid path to build routine.';
-        return result;
+        ewd.sendWebSocketMsg({
+            type: 'buildRoutine',
+            message: result
+        });
+        return;
     }
     if(fs.existsSync(routinePath)){
-        var command = 'mumps ' + routinePath;
+        var routineName = path.basename(routinePath);
+        routineName = routineName.split('.')[0];
+        var command = 'mumps -object=' + objPath + '/' + routineName + '.o ' + routinePath;
         var child = exec(command,
             function (error, stdout, stderr) {
                 var result = {};
@@ -117,7 +129,10 @@ var buildRoutine = function(routinePath,ewd){
             });
     }else{
         result.error = 'Routine Path not given.';
-        //return result;
+        ewd.sendWebSocketMsg({
+            type: 'buildRoutine',
+            message: result
+        });
     }
 };
 
@@ -194,7 +209,6 @@ module.exports = {
         buildRoutine: function(params,ewd){
             if (!ewd.session.isAuthenticated) {return;}
             buildRoutine(params.routinePath,ewd);
-            //return result;
         },
         checkRoutineName: function(params,ewd){
             if (!ewd.session.isAuthenticated) {return;}
