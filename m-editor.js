@@ -9,8 +9,20 @@ var listRoutines = function(routineName){
     var count = 0;
     var gtmRoutines = process.env.gtmroutines;
     var rsplit = gtmRoutines.split('(');
+    var dirs = [];
     for(var i=1; i < rsplit.length; i++){
-        var dir = rsplit[i].split(')')[0];
+        var idir = rsplit[i].split(')')[0].trim();
+        if(idir.indexOf(' ')>0){
+            var indirs = idir.split(' ');
+            for(var i=0; i < indirs.length; i++){
+                dirs.push(indirs[i].trim());
+            }
+        }else{
+            dirs.push(idir);
+        }
+    }
+    for(var i=0; i < dirs.length; i++){
+        var dir = dirs[i];
         fs.readdirSync(dir).forEach(function(name){
             if(count > 19){return files;}
             var stats = fs.statSync(dir + '/' + name);
@@ -35,8 +47,20 @@ var getRoutine = function(routinePath){
     var invalid = true;
     var gtmRoutines = process.env.gtmroutines;
     var rsplit = gtmRoutines.split('(');
+    var dirs = [];
     for(var i=1; i < rsplit.length; i++){
-        var dir = rsplit[i].split(')')[0];
+        var idir = rsplit[i].split(')')[0].trim();
+        if(idir.indexOf(' ')>0){
+            var indirs = idir.split(' ');
+            for(var i=0; i < indirs.length; i++){
+                dirs.push(indirs[i].trim());
+            }
+        }else{
+            dirs.push(idir);
+        }
+    }
+    for(var i=0; i < dirs.length; i++){
+        var dir = dirs[i];
         if(routinePath.indexOf(dir) === 0){
             invalid = false;
         }
@@ -62,8 +86,20 @@ var saveRoutine = function(routinePath,routineText,isNew){
     var invalid = true;
     var gtmRoutines = process.env.gtmroutines;
     var rsplit = gtmRoutines.split('(');
+    var dirs = [];
     for(var i=1; i < rsplit.length; i++){
-        var dir = rsplit[i].split(')')[0];
+        var idir = rsplit[i].split(')')[0].trim();
+        if(idir.indexOf(' ')>0){
+            var indirs = idir.split(' ');
+            for(var i=0; i < indirs.length; i++){
+                dirs.push(indirs[i].trim());
+            }
+        }else{
+            dirs.push(idir);
+        }
+    }
+    for(var i=0; i < dirs.length; i++){
+        var dir = dirs[i];
         if(routinePath.indexOf(dir) === 0){
             invalid = false;
         }
@@ -89,14 +125,26 @@ var buildRoutine = function(routinePath,ewd){
     var gtmRoutines = process.env.gtmroutines;
     var rsplit = gtmRoutines.split('(');
     for(var i=1; i < rsplit.length; i++){
-        var dir = rsplit[i].split(')')[0];
-        if(routinePath.indexOf(dir) === 0){
-            if(rsplit[i-1].indexOf(')')>=0){
-                objPath = rsplit[i-1].split(')')[1].trim();
-            }else{
-                objPath = rsplit[i-1].trim();
+        var dirs = [];
+        var idir = rsplit[i].split(')')[0].trim();
+        if(idir.indexOf(' ')>0){
+            var indirs = idir.split(' ');
+            for(var i=0; i < indirs.length; i++){
+                dirs.push(indirs[i].trim());
             }
-            invalid = false;
+        }else{
+            dirs.push(idir);
+        }
+        for(var j=0; j<dirs.length; j++){
+            dir = dirs[j];
+            if(routinePath.indexOf(dir) === 0){
+                if(rsplit[i-1].indexOf(')')>=0){
+                    objPath = rsplit[i-1].split(')')[1].trim();
+                }else{
+                    objPath = rsplit[i-1].trim();
+                }
+                invalid = false;
+            }
         }
     }
     if(invalid){
@@ -146,14 +194,22 @@ var checkRoutineName = function(routineName){
         var rsplit = gtmRoutines.split('(');
         result.dirs = [];
         for(var i=1; i < rsplit.length; i++){
-            result.dirs.push(rsplit[i].split(')')[0] + '/');
+            var idir = rsplit[i].split(')')[0].trim();
+            if(idir.indexOf(' ')>0){
+                var indirs = idir.split(' ');
+                for(var i=0; i < indirs.length; i++){
+                    result.dirs.push(indirs[i].trim() + '/');
+                }
+            }else{
+                result.dirs.push(idir + '/');
+            }
         }
         result.check = true;
         result.routine = routineName;
-        for(var i=1; i < rsplit.length; i++){
-            var dir = rsplit[i].split(')')[0];
+        for(var i=0; i < result.dirs.length; i++){
+            var dir = result.dirs[i];
             fs.readdirSync(dir).forEach(function(name){
-                var stats = fs.statSync(dir + '/' + name);
+                var stats = fs.statSync(dir + name);
                 if(!stats.isDirectory()){
                     if(name == (routineName + '.m')){
                         result.check = false;
