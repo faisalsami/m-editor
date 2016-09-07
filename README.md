@@ -4,7 +4,7 @@
  
  Please visit the following url for a live version running under OSEHRA FOIA VistA release. Password for application is 123
  
- [http://162.222.183.155:8088/ewd/m-editor/](http://162.222.183.155:8088/ewd/m-editor/)
+ [http://www.vistawebapps.com/m-editor/](http://www.vistawebapps.com/m-editor/)
  
 ## Setup Instructions:
  
